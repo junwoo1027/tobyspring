@@ -1,5 +1,7 @@
 package springbook.template;
 
+import lombok.val;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,7 +22,7 @@ public class Calculator {
 //        };
 //        return fileReadTemplate(filePath, callback);
 
-        LineCallback callback = (line, value) -> value + Integer.valueOf(line);
+        LineCallback<Integer> callback = (line, value) -> value + Integer.valueOf(line);
         return lineReadTemplate(filePath, callback, 0);
     }
 
@@ -39,16 +41,21 @@ public class Calculator {
 //        };
 //        return fileReadTemplate(filePath, callback);
 
-        LineCallback callback = (line, value) -> value * Integer.valueOf(line);
+        LineCallback<Integer> callback = (line, value) -> value * Integer.valueOf(line);
         return lineReadTemplate(filePath, callback, 1);
     }
 
-    public Integer lineReadTemplate(String filePath, LineCallback callback, int val) throws IOException {
+    public String concat(String filePath) throws IOException {
+        LineCallback<String> callback = (line, value) -> value + line;
+        return lineReadTemplate(filePath, callback, "");
+    }
+
+    public <T> T lineReadTemplate(String filePath, LineCallback<T> callback, T val) throws IOException {
         BufferedReader br = null;
 
         try {
             br = new BufferedReader(new FileReader(filePath));
-            Integer res = val;
+            T res = val;
             String line;
 
             while ((line = br.readLine()) != null) {
