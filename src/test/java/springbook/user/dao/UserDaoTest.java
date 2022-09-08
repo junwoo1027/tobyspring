@@ -15,6 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import springbook.user.domain.User;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -36,9 +37,46 @@ public class UserDaoTest {
     }
 
     @Test
+    public void add() {
+        dao.deleteAll();
+        dao.add(user3);
+
+        int count = dao.getCount();
+        assertThat(count).isEqualTo(1);
+    }
+
+    @Test
+    void getAll() {
+        dao.deleteAll();
+
+        List<User> users = dao.getAll();
+        assertThat(users.size()).isEqualTo(0);
+
+        dao.add(user1);
+        List<User> users1 =  dao.getAll();
+        assertThat(dao.getCount()).isEqualTo(1);
+        this.checkSameUser(user1, users1.get(0));
+
+        dao.add(user2);
+        List<User> users2 =  dao.getAll();
+        assertThat(dao.getCount()).isEqualTo(2);
+        this.checkSameUser(user1, users2.get(0));
+        this.checkSameUser(user2, users2.get(1));
+
+        dao.add(user3);
+        List<User> users3 =  dao.getAll();
+        assertThat(dao.getCount()).isEqualTo(3);
+        this.checkSameUser(user1, users3.get(0));
+        this.checkSameUser(user2, users3.get(1));
+        this.checkSameUser(user3, users3.get(2));
+    }
+
+    @Test
     public void addAndGet() throws SQLException {
         dao.deleteAll();
         assertThat(dao.getCount()).isEqualTo(0);
+
+        assertThrows(EmptyResultDataAccessException.class, () -> dao.get("unknown"));
 
         dao.add(user1);
         dao.add(user2);
@@ -74,5 +112,11 @@ public class UserDaoTest {
         assertThat(dao.getCount()).isEqualTo(0);
 
         assertThrows(EmptyResultDataAccessException.class, () -> dao.get("unknown_id"));
+    }
+
+    private void checkSameUser(User user1, User user2) {
+        assertThat(user1.getId()).isEqualTo(user2.getId());
+        assertThat(user1.getName()).isEqualTo(user2.getName());
+        assertThat(user1.getPassword()).isEqualTo(user2.getPassword());
     }
 }

@@ -82,7 +82,7 @@ public class Calculator {
         try {
             br = new BufferedReader(new FileReader(filePath));
             Integer ret = callback.doSomethingWithReader(br);
-            return  ret;
+            return ret;
         } catch (IOException e) {
             System.out.println(e.getMessage());
             throw e;

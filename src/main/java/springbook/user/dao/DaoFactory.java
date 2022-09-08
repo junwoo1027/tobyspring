@@ -1,10 +1,10 @@
 package springbook.user.dao;
 
-import javax.sql.DataSource;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+
+import javax.sql.DataSource;
 
 @Configuration
 public class DaoFactory {
@@ -20,17 +20,10 @@ public class DaoFactory {
 		return dataSource;
 	}
 
-//	@Bean
-//	public JdbcContext jdbcContext() {
-//		JdbcContext context = new JdbcContext(dataSource());
-//		return context;
-//	}
-
 	@Bean
 	public UserDao userDao() {
 		UserDao userDao = new UserDao();
 		userDao.setDataSource(dataSource());
-//		userDao.setJdbcContext(jdbcContext());
 		return userDao;
 	}
 }
