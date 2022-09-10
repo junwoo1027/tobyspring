@@ -3,6 +3,8 @@ package springbook.user.dao;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import springbook.user.service.UserService;
+import springbook.user.service.UserUpgradeLevelImpl;
 
 import javax.sql.DataSource;
 
@@ -21,9 +23,24 @@ public class DaoFactory {
 	}
 
 	@Bean
-	public UserDaoJdbc userDaoJdbc() {
+	public UserDaoJdbc userDao() {
 		UserDaoJdbc userDaoJdbc = new UserDaoJdbc();
 		userDaoJdbc.setDataSource(dataSource());
 		return userDaoJdbc;
 	}
+
+	@Bean
+	public UserService userService() {
+		UserService userService = new UserService();
+		userService.setUserDao(userDao());
+		userService.setUpgradeLevelPolicy(upgradeLevelImpl());
+		return userService;
+	}
+
+	@Bean
+	public UserUpgradeLevelImpl upgradeLevelImpl() {
+		UserUpgradeLevelImpl userUpgradeLevel = new UserUpgradeLevelImpl();
+		return userUpgradeLevel;
+	}
+
 }
