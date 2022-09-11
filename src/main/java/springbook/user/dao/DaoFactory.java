@@ -2,6 +2,7 @@ package springbook.user.dao;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import springbook.user.service.UserService;
 import springbook.user.service.UserUpgradeLevelImpl;
@@ -34,6 +35,7 @@ public class DaoFactory {
 		UserService userService = new UserService();
 		userService.setUserDao(userDao());
 		userService.setUpgradeLevelPolicy(upgradeLevelImpl());
+		userService.setTransactionManager(transactionManager());
 		return userService;
 	}
 
@@ -43,4 +45,9 @@ public class DaoFactory {
 		return userUpgradeLevel;
 	}
 
+	@Bean
+	public DataSourceTransactionManager transactionManager() {
+		DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource());
+		return dataSourceTransactionManager;
+	}
 }

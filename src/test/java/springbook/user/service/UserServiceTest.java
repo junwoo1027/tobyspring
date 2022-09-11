@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.PlatformTransactionManager;
 import springbook.user.dao.DaoFactory;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static springbook.user.service.UserService.MIN_LOGIN_COUNT_FOR_SILVER;
 import static springbook.user.service.UserService.MIN_RECOMMEND_FOR_GOLD;
 
@@ -26,6 +28,10 @@ class UserServiceTest {
     private UserService userService;
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private UserLevelUpgradePolicy userLevelUpgradePolicy;
+    @Autowired
+    private PlatformTransactionManager transactionManager;
     private List<User> users;
 
     @BeforeEach
@@ -71,6 +77,28 @@ class UserServiceTest {
 
         assertThat(getUser1.getLevel()).isEqualTo(user.getLevel());
         assertThat(getUser2.getLevel()).isEqualTo(Level.BASIC);
+    }
+
+    @Test
+    void upgradeAllOrNothing() {
+        TestUserService testUserService = new TestUserService(users.get(3).getId());
+        testUserService.setUserDao(this.userDao);
+        testUserService.setUpgradeLevelPolicy(this.userLevelUpgradePolicy);
+        testUserService.setTransactionManager(transactionManager);
+
+        userDao.deleteAll();
+        for (User user : users) {
+            userDao.add(user);
+        }
+
+        try {
+            testUserService.upgradeLevels();
+            fail("TestUserServiceException");
+        } catch (TestUserServiceException e) {
+
+        }
+
+        checkLevelUpgraded(users.get(1), false);
     }
 
     private void checkLevelUpgraded(User user, boolean upgraded) {

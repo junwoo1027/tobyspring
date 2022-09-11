@@ -8,8 +8,6 @@ import static springbook.user.service.UserService.MIN_LOGIN_COUNT_FOR_SILVER;
 import static springbook.user.service.UserService.MIN_RECOMMEND_FOR_GOLD;
 
 public class UserUpgradeLevelImpl implements UserLevelUpgradePolicy {
-    private UserDao userDao;
-
     @Override
     public boolean canUpgradeLevel(User user) {
         Level currentLevel = user.getLevel();
