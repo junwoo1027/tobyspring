@@ -1,5 +1,7 @@
 package springbook.user.service;
 
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -15,6 +17,11 @@ public class UserService {
     public static final int MIN_RECOMMEND_FOR_GOLD = 30;
     private UserLevelUpgradePolicy upgradeLevelPolicy;
     private PlatformTransactionManager transactionManager;
+    private MailSender mailSender;
+
+    public void setMailSender(MailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     public void setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
@@ -56,5 +63,15 @@ public class UserService {
     protected void upgradeLevel(User user) {
         this.upgradeLevelPolicy.upgradeLevel(user);
         userDao.update(user);
+    }
+
+    private void sendUpgradeEmail(User user) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setFrom("junwoo1027@naver.com");
+        mailMessage.setSubject("Upgrade 안내");
+        mailMessage.setText("등급업 " + user.getLevel().name());
+
+        this.mailSender.send(mailMessage);
     }
 }

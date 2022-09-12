@@ -21,6 +21,7 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.24")
     testImplementation("org.springframework.boot:spring-boot-starter-test:2.6.7")
     testImplementation("org.hamcrest:hamcrest:2.1")
+    implementation("org.springframework.boot:spring-boot-starter-mail:2.5.4")
 }
 
 tasks.getByName<Test>("test") {

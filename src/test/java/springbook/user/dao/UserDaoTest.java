@@ -33,9 +33,9 @@ public class UserDaoTest {
 
     @BeforeEach
     public void setup() {
-        user1 = new User("1", "김준우1", "123", Level.BASIC, 1, 0);
-        user2 = new User("2", "김준우2", "123", Level.SILVER, 55, 10);
-        user3 = new User("3", "김준우3", "123", Level.GOLD, 100, 40);
+        user1 = new User("1", "김준우1", "123", Level.BASIC, 1, 0, "junwoo1027@naver.com");
+        user2 = new User("2", "김준우2", "123", Level.SILVER, 55, 10, "junwoo1027@gmail.com");
+        user3 = new User("3", "김준우3", "123", Level.GOLD, 100, 40, "junwoo1027@ndotlight.com");
     }
 
     @Test

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -32,16 +33,18 @@ class UserServiceTest {
     private UserLevelUpgradePolicy userLevelUpgradePolicy;
     @Autowired
     private PlatformTransactionManager transactionManager;
+    @Autowired
+    MailSender mailSender;
     private List<User> users;
 
     @BeforeEach
     void setUp() {
         users = Arrays.asList(
-                new User("1", "김준우1", "123", Level.BASIC, MIN_LOGIN_COUNT_FOR_SILVER - 1, 0),
-                new User("2", "김준우2", "123", Level.BASIC, MIN_LOGIN_COUNT_FOR_SILVER, 0),
-                new User("3", "김준우3", "123", Level.SILVER, 60, MIN_RECOMMEND_FOR_GOLD - 1),
-                new User("4", "김준우4", "123", Level.SILVER, 60, MIN_RECOMMEND_FOR_GOLD),
-                new User("5", "김준우5", "123", Level.GOLD, 100, Integer.MAX_VALUE)
+                new User("1", "김준우1", "123", Level.BASIC, MIN_LOGIN_COUNT_FOR_SILVER - 1, 0, "junwoo1027@naver.com"),
+                new User("2", "김준우2", "123", Level.BASIC, MIN_LOGIN_COUNT_FOR_SILVER, 0, "junwoo1027@ndotlight.com"),
+                new User("3", "김준우3", "123", Level.SILVER, 60, MIN_RECOMMEND_FOR_GOLD - 1, "junwoo1027@gmail.com"),
+                new User("4", "김준우4", "123", Level.SILVER, 60, MIN_RECOMMEND_FOR_GOLD, "junwoo1027@hanmai.net"),
+                new User("5", "김준우5", "123", Level.GOLD, 100, Integer.MAX_VALUE, "junwoo1027@naver.com")
         );
     }
 
@@ -94,6 +97,7 @@ class UserServiceTest {
         try {
             testUserService.upgradeLevels();
             fail("TestUserServiceException");
+            testUserService.setMailSender(mailSender);
         } catch (TestUserServiceException e) {
 
         }
