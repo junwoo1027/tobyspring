@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -49,6 +50,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DirtiesContext
     void upgradeLevels() {
         userDao.deleteAll();
 
@@ -56,12 +58,20 @@ class UserServiceTest {
             userDao.add(user);
         }
 
+        MockMailSender mockMailSender = new MockMailSender();
+        userService.setMailSender(mockMailSender);
+
         userService.upgradeLevels();
         checkLevelUpgraded(users.get(0), false);
         checkLevelUpgraded(users.get(1), true);
         checkLevelUpgraded(users.get(2), false);
         checkLevelUpgraded(users.get(3), true);
         checkLevelUpgraded(users.get(4), false);
+
+        List<String> requests = mockMailSender.getRequests();
+        assertEquals(requests.size(), 2);
+        assertEquals(users.get(1).getEmail(), requests.get(0));
+        assertEquals(users.get(3).getEmail(), requests.get(1));
     }
 
     @Test
@@ -88,6 +98,7 @@ class UserServiceTest {
         testUserService.setUserDao(this.userDao);
         testUserService.setUpgradeLevelPolicy(this.userLevelUpgradePolicy);
         testUserService.setTransactionManager(transactionManager);
+        testUserService.setMailSender(mailSender);
 
         userDao.deleteAll();
         for (User user : users) {
@@ -97,7 +108,6 @@ class UserServiceTest {
         try {
             testUserService.upgradeLevels();
             fail("TestUserServiceException");
-            testUserService.setMailSender(mailSender);
         } catch (TestUserServiceException e) {
 
         }

@@ -63,6 +63,7 @@ public class UserService {
     protected void upgradeLevel(User user) {
         this.upgradeLevelPolicy.upgradeLevel(user);
         userDao.update(user);
+        sendUpgradeEmail(user);
     }
 
     private void sendUpgradeEmail(User user) {
