@@ -7,7 +7,6 @@ import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import springbook.user.service.DummyMailSender;
 import springbook.user.service.UserServiceImpl;
 import springbook.user.service.UserServiceTx;
-import springbook.user.service.UserUpgradeLevelImpl;
 
 import javax.sql.DataSource;
 
@@ -37,7 +36,7 @@ public class DaoFactory {
 		UserServiceImpl userService = new UserServiceImpl();
 
 		userService.setUserDao(userDao());
-		userService.setUpgradeLevelPolicy(upgradeLevelImpl());
+//		userService.setUpgradeLevelPolicy(upgradeLevelImpl());
 		userService.setMailSender(javaMailSender());
 		return userService;
 	}
@@ -50,11 +49,11 @@ public class DaoFactory {
 		return userServiceTx;
 	}
 
-	@Bean
-	public UserUpgradeLevelImpl upgradeLevelImpl() {
-		UserUpgradeLevelImpl userUpgradeLevel = new UserUpgradeLevelImpl();
-		return userUpgradeLevel;
-	}
+//	@Bean
+//	public UserUpgradeLevelImpl upgradeLevelImpl() {
+//		UserUpgradeLevelImpl userUpgradeLevel = new UserUpgradeLevelImpl();
+//		return userUpgradeLevel;
+//	}
 
 	@Bean
 	public DataSourceTransactionManager transactionManager() {

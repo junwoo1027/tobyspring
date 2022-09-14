@@ -15,7 +15,7 @@ public class UserServiceImpl implements UserService {
     private UserDao userDao;
     public static final int MIN_LOGIN_COUNT_FOR_SILVER = 50;
     public static final int MIN_RECOMMEND_FOR_GOLD = 30;
-    private UserLevelUpgradePolicy upgradeLevelPolicy;
+//    private UserLevelUpgradePolicy upgradeLevelPolicy;
     private MailSender mailSender;
 
     public void setMailSender(MailSender mailSender) {
@@ -26,9 +26,9 @@ public class UserServiceImpl implements UserService {
         this.userDao = userDao;
     }
 
-    public void setUpgradeLevelPolicy(UserLevelUpgradePolicy upgradeLevelPolicy) {
-        this.upgradeLevelPolicy = upgradeLevelPolicy;
-    }
+//    public void setUpgradeLevelPolicy(UserLevelUpgradePolicy upgradeLevelPolicy) {
+//        this.upgradeLevelPolicy = upgradeLevelPolicy;
+//    }
 
     @Override
     public void add(User user) {
@@ -43,14 +43,14 @@ public class UserServiceImpl implements UserService {
         List<User> users = userDao.getAll();
 
         for (User user : users) {
-            if (this.upgradeLevelPolicy.canUpgradeLevel(user)) {
+            if (this.canUpgradeLevel(user)) {
                 upgradeLevel(user);
             }
         }
     }
 
     protected void upgradeLevel(User user) {
-        this.upgradeLevelPolicy.upgradeLevel(user);
+        user.upgradeLevel();
         userDao.update(user);
         sendUpgradeEmail(user);
     }
@@ -63,5 +63,15 @@ public class UserServiceImpl implements UserService {
         mailMessage.setText("등급업 " + user.getLevel().name());
 
         this.mailSender.send(mailMessage);
+    }
+
+    private boolean canUpgradeLevel(User user) {
+        Level currentLevel = user.getLevel();
+        switch (currentLevel) {
+            case BASIC: return (user.getLogin() >= MIN_LOGIN_COUNT_FOR_SILVER);
+            case SILVER: return user.getRecommend() >= MIN_RECOMMEND_FOR_GOLD;
+            case GOLD: return false;
+            default: throw new IllegalArgumentException("Unknown Level");
+        }
     }
 }
