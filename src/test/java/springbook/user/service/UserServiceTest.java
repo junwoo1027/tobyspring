@@ -20,14 +20,16 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
-import static springbook.user.service.UserService.MIN_LOGIN_COUNT_FOR_SILVER;
-import static springbook.user.service.UserService.MIN_RECOMMEND_FOR_GOLD;
+import static springbook.user.service.UserServiceImpl.MIN_LOGIN_COUNT_FOR_SILVER;
+import static springbook.user.service.UserServiceImpl.MIN_RECOMMEND_FOR_GOLD;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DaoFactory.class)
 class UserServiceTest {
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserServiceImpl userServiceImpl;
     @Autowired
     private UserDao userDao;
     @Autowired
@@ -59,9 +61,9 @@ class UserServiceTest {
         }
 
         MockMailSender mockMailSender = new MockMailSender();
-        userService.setMailSender(mockMailSender);
+        userServiceImpl.setMailSender(mockMailSender);
 
-        userService.upgradeLevels();
+        userServiceImpl.upgradeLevels();
         checkLevelUpgraded(users.get(0), false);
         checkLevelUpgraded(users.get(1), true);
         checkLevelUpgraded(users.get(2), false);
@@ -97,8 +99,11 @@ class UserServiceTest {
         TestUserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(this.userDao);
         testUserService.setUpgradeLevelPolicy(this.userLevelUpgradePolicy);
-        testUserService.setTransactionManager(transactionManager);
         testUserService.setMailSender(mailSender);
+
+        UserServiceTx userServiceTx = new UserServiceTx();
+        userServiceTx.setTransactionManager(transactionManager);
+        userServiceTx.setUserService(testUserService);
 
         userDao.deleteAll();
         for (User user : users) {
@@ -106,7 +111,7 @@ class UserServiceTest {
         }
 
         try {
-            testUserService.upgradeLevels();
+            userServiceTx.upgradeLevels();
             fail("TestUserServiceException");
         } catch (TestUserServiceException e) {
 
