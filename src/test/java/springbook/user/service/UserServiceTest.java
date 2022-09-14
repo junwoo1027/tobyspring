@@ -16,6 +16,7 @@ import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.List;
 
@@ -106,9 +107,16 @@ class UserServiceTest {
 //        testUserService.setUpgradeLevelPolicy(this.userLevelUpgradePolicy);
         testUserService.setMailSender(mailSender);
 
-        UserServiceTx userServiceTx = new UserServiceTx();
-        userServiceTx.setTransactionManager(transactionManager);
-        userServiceTx.setUserService(testUserService);
+        TransactionHandler txHandler = new TransactionHandler();
+        txHandler.setTarget(testUserService);
+        txHandler.setTransactionManager(transactionManager);
+        txHandler.setPattern("upgradeLevels");
+
+        UserService txUserService= (UserService)Proxy.newProxyInstance(
+                getClass().getClassLoader(),
+                new Class[] {UserService.class},
+                txHandler
+        );
 
         userDao.deleteAll();
         for (User user : users) {
@@ -116,7 +124,7 @@ class UserServiceTest {
         }
 
         try {
-            userServiceTx.upgradeLevels();
+            txUserService.upgradeLevels();
             fail("TestUserServiceException");
         } catch (TestUserServiceException e) {
 
